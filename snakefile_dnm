@@ -1,0 +1,798 @@
+# Snakefile, a pipeline to anaylsis for new de novo mutations in quad or trio pedigree 
+
+# KEY: ============================================================================================================================
+
+import yaml 
+
+# Calling/Activating the yaml file
+configfile: 'species.yaml'
+species=config["SPECIES"]
+
+# all of the samples
+SAMPLES=config["SAMPLES"]["family"]
+
+# quad: father, mother, and offspring
+QUAD=config["SAMPLES"]["quad"]
+
+# the final group of files 
+OFFSPRING=config["OFFSPRING"]
+
+# the number of chromosomes for that species
+CHROMO=config["CHROMO"]
+
+# calling the reference genome
+REF_GENOME=config["REF_GENOME"]
+
+# temp reference index
+REF_INDEX=config["REF_INDEX"]
+
+# downloaded known sites 
+KNOWN_SITES = config["DOWNLOAD_FILES"]["KNOWN_SITES"]
+
+# store your new text files/logs/graph in your folder path
+FOLDER=config["PATH"]
+
+# the link to the dataset
+TABIX=config["TABIX"]
+BGZIP=config["BGZIP"]
+GATK=config["GATK"]
+OLDBWA=config["OLDBWA"]
+SAMBLASTER=config["SAMBLASTER"]
+SEQTK=config["SEQTK"]
+
+
+# COMMENTS---------------------------------------------------
+# Instead of using <module load gatk>, we utlized GATK from a download 
+
+###################
+# All Output Files
+###################
+
+## description: will create the following files by automatically creating the required files
+rule all:
+    input:
+#        expand("{folder}/bams/{sample}.bam", folder=FOLDER, sample=SAMPLES),
+#        expand("{folder}/bams/sort_{sample}.bam", folder=FOLDER, sample=SAMPLES),
+#        expand("{folder}/bams/sort_{sample}.bam.bai", folder=FOLDER, sample=SAMPLES),
+#        expand("{folder}/QC2/{sample}_coverage.txt.gz", folder=FOLDER, sample=SAMPLES),
+#        expand("{folder}/QC2/{sample}_gwide_coverage.txt", folder=FOLDER, sample=SAMPLES),
+#        expand("{folder}/unknown_HaplotypeCaller/nonbqsr_{sample}_chr{chr}.g.vcf.gz", folder=FOLDER, sample=QUAD, chr=CHROMO),
+#        expand("{folder}/unknown_CombinedGVCF/unknown_group_chr{chr}.g.vcf.gz", folder=FOLDER, chr=CHROMO),
+#        expand("{folder}/unknown_GenotypeGVCF/unknown_variants_chr{chr}.g.vcf.gz", folder=FOLDER, chr=CHROMO),
+#        expand("{folder}/{species}_{child}_ped.ped", folder=FOLDER, species=species, child=config["SAMPLES"]["child"]["name"]),
+#        expand("{folder}/vio_mend/violations_mendelian_chr{chr}.vcf", folder=FOLDER, chr=CHROMO),
+#        expand("{folder}/GATKfilters/All_sites_GATKfilter_chr{chr}.vcf", folder=FOLDER, chr=CHROMO),
+#        expand("{folder}/GATKfilters/All_sites_GATKfilter_QUAL_chr{chr}.vcf", folder=FOLDER, chr=CHROMO),
+#        expand("{folder}/GATKfilters/All_sites_GATKfilter_QUAL_GQ_chr{chr}.vcf", folder=FOLDER, chr=CHROMO),
+#        expand("{folder}/known_variants/known_variants_chr{chr}.vcf", folder=FOLDER, chr=CHROMO),    
+#        expand("{folder}/known_variants/known_variants_chr{chr}.vcf.gz", folder=FOLDER, chr=CHROMO),      
+#        expand("{folder}/known_variants/known_variants_chr{chr}.vcf.gz.tbi", folder=FOLDER, chr=CHROMO), 
+#        expand("{folder}/BaseRecal/{sample}_chr{chr}_recal_1.table", folder=FOLDER, sample=SAMPLES, chr=CHROMO),
+#        expand("{folder}/BaseRecal/{sample}_chr{chr}_bqsr_1.bam", folder=FOLDER, sample=SAMPLES, chr=CHROMO),
+#        expand("{folder}/BaseRecal/{sample}_chr{chr}_recal_2.table", folder=FOLDER, sample=SAMPLES, chr=CHROMO),
+#        expand("{folder}/BaseRecal/{sample}_chr{chr}_bqsr_2.bam", folder=FOLDER, sample=SAMPLES, chr=CHROMO),
+        expand("{folder}/QC3/{sample}_plots_chr{chr}.pdf", folder=FOLDER, sample=SAMPLES, chr=CHROMO),
+#        expand("{folder}/HaplotypeCaller/sites_{sample}_chr{chr}.g.vcf", folder=FOLDER, sample=SAMPLES, chr=CHROMO),
+#        expand("{folder}/CombineGVCFs/group_chr{chr}.g.vcf", folder=FOLDER, chr=CHROMO),
+#        expand("{folder}/GenotypeGVCFs/variants_group_chr{chr}.g.vcf", folder=FOLDER, chr=CHROMO),
+        expand("{folder}/QC4/QC4_heterozygosity_sites_chr{chr}.txt", folder=FOLDER, chr=CHROMO),
+        expand("{folder}/QC4/genome_size_{species}.txt", folder=FOLDER, species=species),
+#        expand("{folder}/QC4/Transversion_chr{chr}.txt", folder=FOLDER, chr=CHROMO),
+        expand("{folder}/QC4/counts_Transversion.txt", folder=FOLDER),
+#        expand("{folder}/QC4/Transition_chr{chr}.txt", folder=FOLDER, chr=CHROMO),
+        expand("{folder}/QC4/counts_Transition.txt", folder=FOLDER),
+        expand("{folder}/DNM/{offspring}_check_dnm_count_chr{chr}.txt", folder=FOLDER, chr=CHROMO, offspring=config["SAMPLES"]["child"]["name"]),
+#        expand("{folder}/DNM/{offspring}_filters_counts.csv", folder=FOLDER, offspring=config['SAMPLES']['child']['name']),
+#        expand("{folder}/DNM/{offspring}_known_variants.csv", folder=FOLDER, offspring=config['SAMPLES']['child']['name'])
+
+
+###################
+# Mapping
+###################
+
+rule fastq:
+    input:
+        fastq1 = config["DOWNLOAD_FILES"]["FASTQ1"],
+        fastq2 = config["DOWNLOAD_FILES"]["FASTQ2"],
+    output:
+        "{folder}/bams/{sample}.bam",
+    envmodules: 
+        config['SAMTOOLS'],
+    params:
+        ref = REF_GENOME,
+        seqtk = SEQTK,
+        oldBwa = OLDBWA,
+        samblaster = SAMBLASTER,
+        R = lambda wildcards, input: "@RG\tID:{sample}\tSM:{sample}\tPL:ILLUMINA\tLB:{sample}\tPI:2000" 
+    log: 
+        "{folder}/log/bams/{sample}_bam.log"
+    benchmark:
+        "{folder}/bams/benchmarks/{sample}_bam.benchmark.txt"
+    message:
+        """
+        {params.seqtk} mergepe {input.fastq1} {input.fastq2} | {params.oldBwa} mem -t 20 -R \"{params.R}\" {params.ref} - | {params.samblaster} | samtools view -bS - > {output} 2> {log}
+        """
+    shell:
+        """
+        {params.seqtk} mergepe {input.fastq1} {input.fastq2} | {params.oldBwa} mem -t 20 -R \"{params.R}\" {params.ref} - | {params.samblaster} | samtools view -bS - > {output} 2> {log}
+        """
+
+###################
+# BAMs sort and index
+###################
+
+rule sort_index:
+    input:
+        bam = "{folder}/bams/{sample}.bam"
+    output:
+        sort = "{folder}/bams/sort_{sample}.bam",
+        bai = "{folder}/bams/sort_{sample}.bam.bai"
+    envmodules:
+       config['SAMTOOLS']
+    log:
+        "{folder}/log/bams/sort_index_{sample}.log"
+    benchmark:
+        "{folder}/bams/benchmarks/sort_index_{sample}.benchmark.txt"
+    shell:
+        """
+        samtools sort -@ 10 -o {output.sort} {input.bam} 2>> {log} | samtools index {output.bai} 2>> {log}
+        """
+
+###################
+# QC2: depth for all samples
+###################
+
+rule qc2_coverage_estimation:
+    input:
+        bam = "{folder}/bams/sort_{sample}.bam",
+        bai = "{folder}/bams/sort_{sample}.bam.bai",
+    output:
+        gz = "{folder}/QC2/{sample}_coverage.txt.gz",
+        gwide = "{folder}/QC2/{sample}_gwide_coverage.txt",
+    envmodules:
+        config['SAMTOOLS']
+    params:
+        coverage = lambda wildcards: config['SAMPLES'][wildcards.sample]['coverage']
+    log:
+        "{folder}/log/QC2/{sample}_QC2.log"
+    benchmark:
+        "{folder}/QC2/benchmarks/{sample}_QC2.benchmark.txt"
+    shell:
+        """
+        samtools depth {input.bam} | gzip > {output.gz} ; zcat {output.gz} 2>> {log} | awk '{{sum+=$3;}} END {{print \"Average = \" sum/NR}}' > {output.gwide} 2>> {log}
+        depth_coverage = $(awk '/Average/ {{print $NF}}' {output.gwide})
+        coverage_max = $({params.coverage}+5)
+        coverage_min = $({params.coverage}-5)
+
+        if [[ $coverage_max -ge $depth_coverage && $coverage_min -le $depth_coverage ]]; then
+             echo "{wildcards.sample} passed with a coverage of $depth_coverage." >&2
+        else
+             echo "Error in {rule}: {wildcards.sample} DID NOT pass with a coverage of $depth_coverage." >&2
+             echo "Next Steps are to redo the alignment for {wildcards.sample}" >&2
+             echo "How? Consider which rule from download, fastq, or sort_index should be deleted and rerun." >&2
+             echo "Command example to restart at sort_index:" >&2
+             echo "snakemake --delete-output sort_index --delete-output qc2_coverage_estimation --forcerun sort_index" >&2
+             exit 1
+        fi
+        """
+
+###################
+# GATK to create the known variant files
+# Based on the father, mother, child, and grandchild
+###################
+
+rule unknown_HaplotypeCaller:
+    input:
+        nonbqsr = "{folder}/bams/{sample}_sort.bam", #editted
+        Qc2 = expand("{folder}/QC2/{sample}_gwide_coverage.txt", folder=FOLDER, sample=SAMPLES)
+    output:
+        new = "{folder}/unknown_HaplotypeCaller/nonbqsr_{sample}_chr{chr}.g.vcf.gz"
+    envmodules:
+        config['JAVA']
+    params:
+        gatk = GATK,
+        ref = REF_GENOME
+    #resources:
+        #runtime = # 8 days, 11 hours    
+    log:
+        "{folder}/log/unknown_HaplotypeCaller/unknown_haplotypeCaller_{sample}_chr{chr}.log"
+    benchmark:
+        "{folder}/unknown_HaplotypeCaller/benchmarks/{chr}.{sample}.benchmark.txt"
+    shell:
+        """
+        {params.gatk} --java-options "-Xmx4g" HaplotypeCaller -R {params.ref} -I {input.nonbqsr} -O {output.new} -L chr{wildcards.chr} -ERC GVCF --sample-name {wildcards.sample} > {log} 2>&1
+        """
+
+rule unknown_CombinedGVCFs:
+    input:
+        nonbqsr = expand("{folder}/unknown_HaplotypeCaller/nonbqsr_{sample}_chr{{chr}}.g.vcf.gz", folder=FOLDER, sample=SAMPLES),
+    output:
+        "{folder}/unknown_CombinedGVCF/unknown_group_chr{chr}.g.vcf"
+    envmodules:
+        config['JAVA']
+    params:
+        gatk = GATK,
+        ref = REF_GENOME,
+        edit = lambda wildcards, input: ' --variant '.join(input.nonbqsr)
+    log:
+        "{folder}/log/unknown_CombinedGVCF/unknown_combinedGVCF_chr{chr}.log"
+    benchmark:
+        "{folder}/unknown_CombinedGVCF/benchmarks/{chr}.unknown_CombineGVCFs.benchmark.txt"
+    message:
+        """
+        {params.gatk} --java-options "-Xmx10g" CombineGVCFs -R {params.ref} --variant {params.edit} -L chr{wildcards.chr} -O {output} > {log} 2>&1
+        """
+    shell:
+        """
+        {params.gatk} --java-options "-Xmx10g" CombineGVCFs -R {params.ref} --variant {params.edit} -L chr{wildcards.chr} -O {output} > {log} 2>&1
+        """
+
+rule unknown_GenotypeGVCFs:
+    input:
+        group = "{folder}/unknown_CombinedGVCF/unknown_group_chr{chr}.g.vcf"
+    output:
+        "{folder}/unknown_GenotypeGVCF/unknown_variants_chr{chr}.g.vcf"
+    envmodules:
+        config['JAVA']
+    params:
+        gatk = GATK,
+        ref = REF_GENOME
+    log:
+        "{folder}/log/unknown_GenotypeGVCF/unknown_genotypeGVCF_chr{chr}.log"   
+    benchmark:
+        "{folder}/unknown_GenotypeGVCF/benchmarks/{chr}.benchmark.txt"
+    shell:
+        """
+        {params.gatk} --java-options "-Xmx4g" GenotypeGVCFs -R {params.ref} -V {input.group} -L chr{wildcards.chr} -O {output} > {log} 2>&1
+        """
+
+###################
+# Filtering for high quality known variants
+###################
+
+
+rule make_pedigree:
+    output: 
+        "{folder}/{species}_{child}_pedigree.ped"
+    params:
+        father = config["SAMPLES"]["father"]["name"],
+        mother = config["SAMPLES"]["mother"]["name"],
+        child = config["SAMPLES"]["child"]["name"],
+        f2 = config["SAMPLES"]["f2"]["name"],
+        child_gender = config["SAMPLES"]["child"]["gender"],
+    log:
+        "{folder}/log/make_pedigree/{species}_{child}_pedigree.log",
+    benchmark:
+        "{folder}/make_pedigree/benchmarks/{species}.{child}.ped.benchmark.txt",
+    shell:
+        """
+        if [ "{params.child_gender}" = "male" ]; then
+             gender='1'
+             echo "Child's gender: $gender" >&2
+        elif [ "{params.child_gender}" = "female" ]; then
+             gender='2'
+             echo "Child's gender: $gender" >&2
+        elif [ "{params.child_gender}" = "*" ]; then
+             gender='*'
+             echo "Child's gender: $gender" >&2
+        else
+             echo "Error in {rule}: child's gender was left as 'False' or *blank* in the yaml file" >&2
+             exit 1
+        fi
+
+        awk -v OFS='\t' -v g="$gender" -v c="{params.child}" -v f="{params.father}" -v m="{params.mother}" -v f2="{params.f2}" \
+            'BEGIN {{ print g, c, f, m, g, f2}}'' > {output} 2> {log}
+        """
+
+rule mendelian_errors:
+    input:
+        vcf = "{folder}/unknown_GenotypeGVCF/unknown_variants_chr{chr}.g.vcf",
+        ped = expand("{folder}/{species}_{child}_ped.ped", folder=FOLDER, species=species, child=config["SAMPLES"]["child"]["name"])
+    output:
+        mend = "{folder}/vio_mend/violations_mendelian_chr{chr}.vcf"
+    envmodules:
+        config['JAVA']
+    params:
+        gatk = GATK,
+        ref = REF_GENOME,
+    log:
+        "{folder}/log/vio_mend/VMend_chr{chr}.log"
+    benchmark:
+        "{folder}/vio_mend/benchmarks/{chr}.benchmark.txt"
+    shell:
+        """
+        {params.gatk} --java-options "-Xmx10g" SelectVariants -R {params.ref} -V {input.vcf} -ped {params.ped} --mendelian-violation --mendelian-violation-qual-threshold 50 -O {output.mend} -L chr{wildcards.chr} > {log} 2>&1 
+        """
+
+rule GATK_filters:    
+    input:
+        vcf = "{folder}/unknown_GenotypeGVCF/unknown_variants_chr{chr}.g.vcf"
+    output:
+        out = "{folder}/GATKfilters/All_sites_GATKfilter_chr{chr}.vcf"
+    params:
+        gatk = GATK,
+        ref = REF_GENOME
+    log:
+        "{folder}/log/GATKfilters/filters1_chr{chr}.log"
+    benchmark:
+        "{folder}/GATKfilters/benchmarks/filters1_chr{chr}.benchmark.txt"
+    shell:
+        """
+        {params.gatk} VariantFiltration -R {params.ref} -V {input.vcf} --filter-expression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0 || SOR > 3.0" --filter-name "my_snp_filter" -L chr{wildcards.chr} -O {output.out} > {log} 2>&1
+        """
+
+#description: Saving positions with a quality score over 100
+rule QUAL:
+    input:
+        "{folder}/GATKfilters/All_sites_GATKfilter_chr{chr}.vcf"
+    output:
+        "{folder}/GATKfilters/All_sites_GATKfilter_QUAL_chr{chr}.vcf"
+    envmodules:
+        config['BCFTOOLS']
+    log:
+        "{folder}/log/GATKfilters/QUAL_chr{chr}.log"
+    benchmark:
+        "{folder}/GATKfilters/benchmarks/QUAL_chr{chr}.benchmark.txt"
+    shell:
+        """
+        bcftools view -i "QUAL>=50" {input} -o {output} -O v > {log} 2>&1
+        """
+
+# description: Genetype Quaility (GQ) has a score greater than 40 because will mean 99.999% accuray
+rule GQ:
+    input:
+        qual = "{folder}/GATKfilters/All_sites_GATKfilter_QUAL_chr{chr}.vcf",
+    output:
+        GQ = "{folder}/GATKfilters/All_sites_GATKfilter_QUAL_GQ_chr{chr}.vcf",
+    params:
+        gatk = GATK,
+        ref = REF_GENOME,
+        edit = " && ".join([f"vc.getGenotype(\"{name}\").getGQ()>40" for name in SAMPLES]),
+    log:
+        "{folder}/log/GATKfilters/GQ_chr{chr}.log",
+    benchmark:
+        "{folder}/GATKfilters/benchmarks/GQ_chr{chr}.benchmark.txt"
+    message:
+        """
+        {params.gatk} SelectVariants -R {params.ref} -V {input.qual} --restrict-alleles-to BIALLELIC -select \'{params.edit}\' -O {output.GQ} > {log} 2>&1
+        """
+    shell:
+        """
+        {params.gatk} SelectVariants -R {params.ref} -V {input.qual} --restrict-alleles-to BIALLELIC -select \'{params.edit}\' -O {output.GQ} > {log} 2>&1
+        """
+
+
+#description: removed positions from All_sites_GATKfilter_QUAL_GQ_chr{chr}.vcf if they were also in violations_mendelian_chr{chr}.vcf
+rule one_known_variants:
+    input:
+        GQ = "{folder}/GATKfilters/All_sites_GATKfilter_QUAL_GQ_chr{chr}.vcf",
+        mend = "{folder}/vio_mend/violations_mendelian_chr{chr}.vcf",
+    output:
+        sites = "{folder}/known_variants/known_variants_chr{chr}.vcf",
+    envmodules:
+        config['BEDTOOLS'],
+    log:
+        "{folder}/log/known_variants/ALLfilters_chr{chr}.log",
+    benchmark:
+        "{folder}/known_variants/benchmarks/ALLfilters_chr{chr}.benchmark.txt",
+    shell:
+        """
+        bedtools intersect -header -a {input.mend} -b {input.GQ} > {output.sites} 2> {log}
+        """
+
+###################
+# Compare VCF for BQSR
+###################
+
+rule bgzip_index:
+    input:
+        "{folder}/known_variants/known_variants_chr{chr}.vcf",
+    output:
+        compress = "{folder}/known_variants/known_variants_chr{chr}.vcf.gz",
+        index = "{folder}/known_variants/known_variants_chr{chr}.vcf.gz.tbi"
+    params:
+        bgzip = BGZIP,
+        tabix = TABIX
+    log:
+        "{folder}/log/known_variants/variants_compress_index_chr{chr}.log"
+    shell:
+        """
+        {params.bgzip} -c {input} > {output.compress} 2>> {log} | {params.tabix} -p vcf {output.compress} 2>> {log}
+        """
+
+###################
+# BSQR x 2
+# Checking base qualities
+###################
+
+rule BaseRecal_1:
+    input:
+        bam = "{folder}/bams/sort_{sample}.bam",
+        #sites = KNOWN_SITES # if we already have the known sites
+        sites = "{folder}/known_variants/known_variants_chr{chr}.vcf.gz"
+    output:
+        recal1 = "{folder}/BaseRecal/{sample}_chr{chr}_recal_1.table"
+    params:
+        gatk = GATK,
+        ref = REF_GENOME,
+    resources:
+        time = "2-00:00:00", 
+        mem_mb = 300 * 1000 # convert from mb to gb by times 1000 
+    log: 
+        "{folder}/log/BaseRecal/grand/recal_1_{sample}_chr{chr}.log"
+    benchmark:
+        "{folder}/BaseRecal/benchmarks/grand/{chr}.{sample}.recal1.benchmark.txt"
+    shell:
+        """
+        {params.gatk} BaseRecalibrator -R {params.ref} -I {input.bam} --known-sites {input.sites} -O {output.recal1} -L chr{wildcards.chr} > {log} 2>&1
+        """
+
+rule ApplyBQSR_1:
+    input:
+        bam = "{folder}/bams/sort_{sample}.bam",
+        recal1 = "{folder}/BaseRecal/{sample}_chr{chr}_recal_1.table"
+    output:
+        bqsr1 = "{folder}/BaseRecal/{sample}_chr{chr}_bqsr_1.bam"
+    params: 
+        gatk = GATK,
+        ref = REF_GENOME,
+    resources:
+        time = "00:30:00",
+        mem_mb = 400 * 1000 # convert from mb to gb by times 1000
+    log:
+        "{folder}/log/BaseRecal/grand/bqsr_1_{sample}_chr{chr}.log"
+    benchmark:      
+        "{folder}/BaseRecal/benchmarks/grand/{chr}.{sample}.bqsr1.benchmark.txt"
+    shell:
+        """
+        {params.gatk} ApplyBQSR -R {params.ref} -I {input.bam} --bqsr-recal-file {input.recal1} -O {output.bqsr1} -L chr{wildcards.chr} > {log} 2>&1
+        """
+
+rule BaseRecal_2:
+    input:
+        bqsr1 = "{folder}/BaseRecal/{sample}_chr{chr}_bqsr_1.bam",
+        #sites = KNOWN_SITES # we need to create it. Other if-else 
+        sites = "{folder}/known_variants/known_variants_chr{chr}.vcf.gz"
+    output:
+        recal2 = "{folder}/BaseRecal/{sample}_chr{chr}_recal_2.table"
+    params:
+        gatk = GATK,
+        ref = REF_GENOME,
+    resources:
+        time = "01:00:00",
+        mem_mb = 400 * 1000 # convert from mb to gb by times 1000
+    log:
+        "{folder}/log/BaseRecal/recal_2_{sample}_chr{chr}.log"
+    benchmark:  
+        "{folder}/BaseRecal/benchmarks/{chr}.{sample}.recal2.benchmark.txt"
+    shell:
+        """
+        {params.gatk} BaseRecalibrator -R {params.ref} -I {input.bqsr1} --known-sites {input.sites} -O {output.recal2} -L chr{wildcards.chr} > {log} 2>&1
+        """
+
+rule ApplyBQSR_2:
+    input:
+        bqsr1 = "{folder}/BaseRecal/{sample}_chr{chr}_bqsr_1.bam",
+        recal2 = "{folder}/BaseRecal/{sample}_chr{chr}_recal_2.table"
+    output:
+        bqsr2 = "{folder}/BaseRecal/{sample}_chr{chr}_bqsr_2.bam"
+    params:
+        gatk = GATK,
+        ref = REF_GENOME,
+    resources:
+        time = "01:00:00",
+        mem_mb = 400 * 1000 # convert from mb to gb by times 1000
+    log: 
+        "{folder}/log/BaseRecal/bqsr_2_{sample}_chr{chr}.log"
+    benchmark:
+        "{folder}/BaseRecal/benchmarks/{chr}.{sample}.bqsr2.benchmark.txt"
+    shell:
+        """
+        {params.gatk} ApplyBQSR -R {params.ref} -I {input.bqsr1} --bqsr-recal-file {input.recal2} -O {output.bqsr2} -L chr{wildcards.chr} > {log} 2>&1
+        """
+
+###################
+# QC3: BQSR 
+###################
+
+rule qc3_analyze_BQSR:
+    input:
+        recal1 = "{folder}/BaseRecal/{sample}_chr{chr}_recal_1.table",
+        recal2 = "{folder}/BaseRecal/{sample}_chr{chr}_recal_2.table"
+    output:
+        pdf = "{folder}/QC3/{sample}_plots_chr{chr}.pdf"
+    envmodules:
+        config['R'],
+    params:
+        gatk = GATK,
+    resources:
+        time = "00:30:00",
+        mem_mb = 80 * 1000 # convert from mb to gb by times 1000
+    log:
+        "{folder}/log/QC3/QC3_{sample}_chr{chr}.log"
+    benchmark:
+        "{folder}/QC3/benchmarks/{chr}.{sample}.QC3.benchmark.txt"
+    shell:
+        """
+        {params.gatk} AnalyzeCovariates -before {input.recal1} -after {input.recal2} -plots {output.pdf} > {log} 2>&1
+        """
+
+###################
+# GATK
+###################
+
+rule known_HaplotypeCaller:
+    input:
+        bqsr = "{folder}/BaseRecal/{sample}_chr{chr}_bqsr_2.bam"
+    output:
+        known = "{folder}/HaplotypeCaller/sites_{sample}_chr{chr}.g.vcf.gz"
+    envmodules:
+        config['JAVA']
+    params:
+        gatk = GATK,
+        ref = REF_GENOME,
+    resources:
+        time = "4-00:00:00",
+        mem_mb = 400 * 1000 # convert from mb to gb by times 1000
+    log: 
+        "{folder}/log/HaplotypeCaller/haplotypeCaller_{sample}_chr{chr}.log"
+    benchmark:
+        "{folder}/HaplotypeCaller/benchmarks/{chr}.{sample}.HaplotypeCaller.benchmark.txt"
+    shell:
+        """
+        {params.gatk} --java-options "-Xmx4g" HaplotypeCaller -R {params.ref} -I {input.bqsr} -O {output.known} -L chr{wildcards.chr} -ERC GVCF --sample-name {wildcards.sample} > {log} 2>&1
+        """
+
+
+rule known_CombineGVCFs:
+    input:
+        bqsr = expand("{folder}/HaplotypeCaller/sites_{sample}_chr{{chr}}.g.vcf.gz", folder=FOLDER, sample=SAMPLES)
+    output:
+        "{folder}/CombineGVCFs/group_chr{chr}.g.vcf"
+    envmodules:
+        config['JAVA']
+    params:
+        gatk = GATK,
+        ref = REF_GENOME,
+        edit = lambda wildcards, input: ' --variant '.join(input.bqsr)
+    log:
+        "{folder}/log/CombineGVCFs/CombineGVCFs_chr{chr}.log"
+    benchmark:
+        "{folder}/CombineGVCFs/benchmarks/{chr}.CombinedGVCFs.benchmark.txt"
+    resources:
+        time = "8-00:00:00",
+        mem_mb = 300 * 1000 # convert from mb to gb by times 1000 
+    message:
+        """
+        {params.gatk} --java-options "-Xmx10g" CombineGVCFs -R {params.ref} --variant {params.edit} -L chr{wildcards.chr} -O {output} > {log} 2>&1
+        """
+    shell:
+        """
+        {params.gatk} --java-options "-Xmx10g" CombineGVCFs -R {params.ref} --variant {params.edit} -L chr{wildcards.chr} -O {output} > {log} 2>&1
+        """
+
+
+rule known_GenotypeGVCFs:
+    input:
+        file = "{folder}/CombineGVCFs/group_chr{chr}.g.vcf"
+    output:
+        "{folder}/GenotypeGVCFs/variants_group_chr{chr}.g.vcf"
+    envmodules:
+        config['JAVA']
+    params:
+        gatk = GATK,
+        ref = REF_GENOME
+    resources:
+        time = 1200, # in seconds
+    log:
+        "{folder}/log/GenotypeGVCFs/genotypeGVCF_chr{chr}.log"
+    benchmark:
+        "{folder}/GenotypeGVCFs/benchmarks/{chr}.GenotypeGVCFs.benchmark.txt"
+    shell:
+        """
+        {params.gatk} --java-options "-Xmx4g" GenotypeGVCFs -R {params.ref} -V {input.file} -L chr{wildcards.chr} -O {output} > {log} 2>&1
+        """
+
+
+###################
+# Heterozgosity
+###################
+
+rule qc4_heterozygosity:
+    input:
+        "{folder}/GenotypeGVCFs/variants_group_chr{chr}.g.vcf"
+    output:
+        "{folder}/QC4/QC4_heterozygosity_sites_chr{chr}.txt"
+    log:
+        "{folder}/log/QC4/QC4_heterozygosity_sites_chr{chr}.log"
+    benchmark:
+        "{folder}/QC4/benchmarks/{chr}.heterozygosity.benchmark.txt"
+    message:
+        """
+        grep -v "^#" {input} | awk '{{ if(length($4)==length($5) && length($5)==1) {{print $0}} }}' | awk '{{print $10}}' | cut -f 1 -d \":\" | grep \"0/1\" | wc -l > {output} 2> {log}
+        """
+    shell:
+        """
+        grep -v "^#" {input} | awk '{{ if(length($4)==length($5) && length($5)==1) {{print $0}} }}' | awk '{{print $10}}' | cut -f 1 -d \":\" | grep \"0/1\" | wc -l > {output} 2> {log}
+        """
+
+###################
+# Callable Genome Size
+###################
+
+
+rule callable_genome:
+    input:
+        ref = REF_INDEX
+        #ref = "" # snakemake created the index of the reference genome 
+    output:
+        "{folder}/QC4/QC4_genome_size_{species}.txt"
+    log:
+        "{folder}/log/QC4/QC4_genome_size_{species}.log"
+    benchmark:
+        "{folder}/QC4/benchmarks/resource/genome.{species}.benchmark.txt"
+    shell:
+        """
+	    awk '{{sum+=$2}} END {{print sum}}' {input.ref} > {output} 2> {log}
+	    """
+
+###################
+# Transversion counts
+###################
+
+rule Transversion_chr:
+    input:
+        "{folder}/GenotypeGVCFs/variants_group_chr{chr}.g.vcf"
+    output:
+        temp("{folder}/QC4/Transversion_chr{chr}.txt")
+    log:
+        "{folder}/log/QC4/counts_Transversion_chr{chr}.log"
+    benchmark:
+        "{folder}/QC4/benchmarks/{chr}.Transversion.benchmark.txt"
+    message:
+        """
+        awk -F '\t' '{{if(($4 == "A" && $5 == "C") || ($4 == "C" && $5 == "A") || ($4 == "T" && $5 == "G") || ($4 == "G" && $5 == "T") || ($4 == "T" && $5 == "A") || ($4 == "A" && $5 == "T") || ($4 == "G" && $5 == "C") || ($4 == "C" && $5 == "G")) {{print $0}}}}' {input} | wc -l > {output} 2> {log}
+        """
+    shell:
+        """
+        awk -F '\t' '{{if(($4 == "A" && $5 == "C") || ($4 == "C" && $5 == "A") || ($4 == "T" && $5 == "G") || ($4 == "G" && $5 == "T") || ($4 == "T" && $5 == "A") || ($4 == "A" && $5 == "T") || ($4 == "G" && $5 == "C") || ($4 == "C" && $5 == "G")) {{print $0}}}}' {input} | wc -l > {output} 2> {log}
+        """
+
+rule Transversion:
+    input:
+        expand("{folder}/QC4/Transversion_chr{chr}.txt", folder=FOLDER, chr=CHROMO)
+    output:
+        "{folder}/QC4/counts_Transversion.txt"
+    log:
+        "{folder}/log/QC4/counts_Transversion.log"
+    benchmark:
+        "{folder}/QC4/benchmarks/single.Transversion.benchmark.txt"
+    message:
+        """
+        cat {input} | awk '{{sum += $1}} END {{print sum}}' > {output} 2> {log}
+        """
+    shell:
+        """
+        cat {input} | awk '{{sum += $1}} END {{print sum}}' > {output} 2> {log}
+        """
+
+###################
+# Transition counts
+###################
+
+rule Transition_chr:
+    input:
+        "{folder}/GenotypeGVCFs/variants_group_chr{chr}.g.vcf"
+    output:
+        temp("{folder}/QC4/Transition_chr{chr}.txt")
+    log:
+        "{folder}/log/QC4/counts_Transition_chr{chr}.log"
+    benchmark:
+        "{folder}/QC4/benchmarks/{chr}.Transition.benchmark.txt"
+#    resources:
+#        mem =
+    message:
+        """
+        awk -F '\t' '{{if(($4 == "A" && $5 == "G") || ($4 == "G" && $5 == "A") || ($4 == "T" && $5 == "C") || ($4 == "C" && $5 == "T")) {{print $0}}}}' {input} | wc -l > {output} 2> {log}
+        """
+    shell:
+        """
+        awk -F '\t' '{{if(($4 == "A" && $5 == "G") || ($4 == "G" && $5 == "A") || ($4 == "T" && $5 == "C") || ($4 == "C" && $5 == "T")) {{print $0}}}}' {input} | wc -l > {output} 2> {log}
+        """
+
+rule Transition:
+    input:
+        expand("{folder}/QC4/Transition_chr{chr}.txt", folder=FOLDER, chr=CHROMO)
+    output:
+        "{folder}/QC4/counts_Transition.txt"
+    log:
+        "{folder}/log/QC4/counts_Transition.log"
+    benchmark:
+        "{folder}/QC4/benchmarks/single.Transition.benchmark.txt"
+    message:
+        """
+        cat {input} | awk '{{sum += $1}} END {{print sum}}' > {output} 2> {log}
+        """
+    shell:
+        """
+        cat {input} | awk '{{sum += $1}} END {{print sum}}' > {output} 2> {log}
+        """
+
+
+###################
+# De Novo Mutations
+###################
+
+rule DNM_Filters:
+    input:
+        filter_python = config["PYTHON_SCRIPTS"]["FILTERS"],
+        vcf = "{folder}/GenotypeGVCFs/variants_group_chr{chr}.g.vcf",
+        #sites = KNOWN_SITES,
+        sites = "{folder}/known_variants/known_variants_chr{chr}.vcf",
+        # KEEP HERE, SO SNAKEMAKE KNOWS TO GENERATE THESE FILE FROM THE RULE(extract)
+        DP_files = expand("{folder}/QC2/{sample}_gwide_coverage.txt", folder=FOLDER, sample=SAMPLES),
+        # the files to extract the depth number
+        child_file=expand("{folder}/QC2/{sample}_gwide_coverage.txt", folder=FOLDER, sample=config["SAMPLES"]["child"]["name"]),
+        mother_file=expand("{folder}/QC2/{sample}_gwide_coverage.txt", folder=FOLDER, sample=config["SAMPLES"]["mother"]["name"]),
+        father_file=expand("{folder}/QC2/{sample}_gwide_coverage.txt", folder=FOLDER, sample=config["SAMPLES"]["father"]["name"]),
+        #title=expand("{folder}/DNM/{child}_check", folder=FOLDER, child=config["SAMPLES"]["child"]),
+    output:
+        "{folder}/DNM/{offspring}_check_dnm_count_chr{chr}.txt"
+    envmodules:
+        config['PYTHON']
+    params:
+        #output: lambda wildcards: "{FOLDER}/DNM/{config["SAMPLES"]["child"]}_check"
+        output = OFFSPRING,
+        # names
+        father = config["SAMPLES"]["father"]["name"],
+        mother = config["SAMPLES"]["mother"]["name"],
+        child = config["SAMPLES"]["child"]["name"],
+        f2 = config["SAMPLES"]["f2"]["name"],
+    log:
+        "{folder}/log/DNM/{offspring}_check_chr{chr}.log"
+    benchmark:
+        "{folder}/DNM/benchmarks/{chr}.{offspring}.benchmark.txt"
+    message:
+        """
+        father_DP=$(awk '/Average/ {{print $NF}}' {input.father_file})
+        mother_DP=$(awk '/Average/ {{print $NF}}' {input.mother_file})
+        child_DP=$(awk '/Average/ {{print $NF}}' {input.child_file})
+        echo "Child DP = $child_DP"
+        echo "Father DP = $father_DP"
+        echo "Mother DP = $mother_DP"
+        python {input.filter_python} --mother {params.mother} --father {params.father} --child {params.child} --f2 {params.f2} --vcf {input.vcf} --chr {wildcards.chr} --known_var {input.sites} --output {params.output} --child_DP $child_DP --mother_DP $mother_DP --father_DP $father_DP > {log} 2>&1
+        """
+    shell:
+        """
+        father_DP=$(awk '/Average/ {{print $NF}}' {input.father_file})
+        mother_DP=$(awk '/Average/ {{print $NF}}' {input.mother_file})
+        child_DP=$(awk '/Average/ {{print $NF}}' {input.child_file})
+        echo "Child DP = $child_DP"
+        echo "Father DP = $father_DP"
+        echo "Mother DP = $mother_DP"
+        python {input.filter_python} --mother {params.mother} --father {params.father} --child {params.child} --f2 {params.f2} --vcf {input.vcf} --chr {wildcards.chr} --known_var {input.sites} --output {params.output} --child_DP $child_DP --mother_DP $mother_DP --father_DP $father_DP > {log} 2>&1
+        """
+
+###################
+# DISPLAY THE DATA
+###################
+
+rule DNM_tables:
+    input:
+        DNMs = expand("{folder}/DNM/{{offspring}}_check_dnm_count_chr{chr}.txt", folder=FOLDER, chr=CHROMO),
+        table_python = config['PYTHON_SCRIPTS']['TABLES']
+    output: # people can change the names 
+        table1 = "{folder}/DNM_tables/{offspring}_filters_counts.csv",
+        table2 = "{folder}/DNM_tables/{offspring}_known_variants.csv"
+    params:
+        yaml = config['YAML']
+    envmodules:
+        config['PYTHON']
+    log:
+        "{folder}/log/DNM_tables/{offspring}_tables.log"
+    benchmark:
+        "{folder}/DNM_tables/benchmarks/{offspring}_tables.benchmark.txt"
+    shell:
+        """
+        python {input.table_python} --config {params.yaml} --table_1 {output.table1} --table_2 {output.table2}
+        """

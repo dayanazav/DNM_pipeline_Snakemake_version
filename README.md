@@ -10,7 +10,7 @@ Steps to install dependencies and set up the environment.
 
 Examples of how to run the code or workflow.
 
-## Project Structure
+## Repository Structure
 
 - `src/` — source code for the Snakemake 
 - `config/` - YAML config

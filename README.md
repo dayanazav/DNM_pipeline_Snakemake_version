@@ -168,7 +168,7 @@ root_directory
 │   ├── QC2
 │   ├── QC3
 │   ├── QC4
-│   └── hg19.fa.ped
+│   └── {species}_{child}_ped.ped
 ```
 - `src/` — source code for the Snakemake 
 - `config/` - YAML config
@@ -205,7 +205,7 @@ root_directory
 │   │    ├── unknown_haplotypeCaller_chr1.vcf, etc.
 │   │    ├── benchmark
 │   ├── vio_mend
-│   └── hg19.fa.ped
+│   └── {species}_{child}_ped.ped
 
 ```
 ## Contributing

@@ -154,22 +154,22 @@ root_directory
 ├── Snakefile
 ├── run_snakefile.sh 
 ├ ─ Additional Files* 
-├── output
-│   ├── bams
-│   ├── DNM
-│   ├── DNM_summary
-│   ├── CombinedGVCF
-│   ├── GenotypeGVCF
-│   ├── HaplotypeCaller
-│   │    ├── haplotypeCaller_chr1.vcf, etc.
-│   │    ├── benchmark
-│   ├── log
-│   ├── make_pedigree
-│   ├── mutation_spectrum
-│   ├── QC2
-│   ├── QC3
-│   ├── QC4
-│   └── {species}_{child}_ped.ped
+└── output
+    ├── bams
+    ├── DNM
+    ├── DNM_summary
+    ├── CombinedGVCF
+    ├── GenotypeGVCF
+    ├── HaplotypeCaller
+    │    ├── haplotypeCaller_chr1.vcf, etc.
+    │    └── benchmark
+    ├── log
+    ├── make_pedigree
+    ├── mutation_spectrum
+    ├── QC2
+    ├── QC3
+    ├── QC4
+    └── {species}_{child}_ped.ped
 ```
 
 ```
@@ -180,29 +180,29 @@ root_directory
 ├── Snakefile
 ├── run_snakefile.sh 
 ├ ─ Additional Files* 
-├── output
-│   ├── bams
-│   ├── BaseRecal
-│   ├── DNM
-│   ├── DNM_summary
-│   ├── CombinedGVCF
-│   ├── GATKfilters
-│   ├── GenotypeGVCF
-│   ├── HaplotypeCaller
-│   ├── known_variants
-│   ├── log
-│   ├── make_pedigree
-│   ├── mutation_spectrum
-│   ├── QC2
-│   ├── QC3
-│   ├── QC4
-│   ├── unknown_CombinedGVCF
-│   ├── unknown_GenotypeGVCF
-│   ├── unknown_HaplotypeCaller
-│   │    ├── unknown_haplotypeCaller_chr1.vcf, etc.
-│   │    ├── benchmark
-│   ├── vio_mend
-│   └── {species}_{child}_ped.ped
+└── output
+    ├── bams
+    ├── BaseRecal
+    ├── DNM
+    ├── DNM_summary
+    ├── CombinedGVCF
+    ├── GATKfilters
+    ├── GenotypeGVCF
+    ├── HaplotypeCaller
+    ├── known_variants
+    ├── log
+    ├── make_pedigree
+    ├── mutation_spectrum
+    ├── QC2
+    ├── QC3
+    ├── QC4
+    ├── unknown_CombinedGVCF
+    ├── unknown_GenotypeGVCF
+    ├── unknown_HaplotypeCaller
+    │    ├── unknown_haplotypeCaller_chr1.vcf, etc.
+    │    └── benchmark
+    ├── vio_mend
+    └── {species}_{child}_ped.ped
 
 ```
 

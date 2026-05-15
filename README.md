@@ -128,20 +128,6 @@ snakemake \
     --latency-wait <seconds>
 ```
 
-### de_novo_filters.py walkthrough
-
-
-### de_novo_tables.py walkthrough
-
-
-### de_novo_graphs.py walkthrough
-
-
-### mutation_spectrum_graph.py walkthrough
-
-
-Examples of how to run the code or workflow.
-
 ## Snakemake's Output Structure
 
 Additional Files: species.yaml, all of the 4 python scripts, reference genome, and indexed reference genome

@@ -32,7 +32,7 @@ This pipeline is managed via a Conda environment to ensure all dependencies are 
 ## Installation
 Steps to install dependencies and set up the environment.
 
- 1. Install Conda: Ensure you have [Miniconda or Anaconda](https://docs.anaconda.com/free/miniconda/index.html) installed.
+ 1. Install Conda: Ensure you have [Miniconda](https://docs.anaconda.com/free/miniconda/index.html) or [Anaconda](https://www.anaconda.com/download) installed.
  2. Set up the Environment: 
 ```bash
 conda create -c conda-forge -c bioconda -n pipeline snakemake=8.14.0

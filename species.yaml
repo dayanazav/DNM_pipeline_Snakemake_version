@@ -56,7 +56,7 @@ SAMPLES:
    father: 
      name: &dad "B" # Father Name or label
    child:
-     gender: "Male or Female or *" # Optional: Offspring Gender
+     gender: "*" # Optional: Offspring Gender as either Male, Female, or *
      name: &kid "C" # Offspring Name or label
    f2: 
      name: &grand "D" # Required: (Grandchild's Name or label) OR (False or None or "")

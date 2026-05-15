@@ -147,7 +147,7 @@ Examples of how to run the code or workflow.
 Additional Files: species.yaml, all of the 4 python scripts, reference genome, and indexed reference genome
     + Special Note: If these additional files were detailed with their absolute path within the YAML file, then you do not have to switch their current location to the root_directory.
 ```
-# When 
+# Running with a known_variant.vcf file
 root_directory
 │
 ├── species.yaml
@@ -161,21 +161,19 @@ root_directory
 │   ├── CombinedGVCF
 │   ├── GenotypeGVCF
 │   ├── HaplotypeCaller
+│   │    ├── haplotypeCaller_chr1.vcf, etc.
+│   │    ├── benchmark
 │   ├── log
 │   ├── make_pedigree
 │   ├── mutation_spectrum
-│   ├── QC1
 │   ├── QC2
 │   ├── QC3
 │   ├── QC4
 │   └── {species}_{child}_ped.ped
 ```
-- `src/` — source code for the Snakemake 
-- `config/` - YAML config
-- `README.md` - This file
 
 ```
-# 
+# Running without a known_variant.vcf file
 root_directory
 │
 ├── species.yaml
@@ -195,7 +193,6 @@ root_directory
 │   ├── log
 │   ├── make_pedigree
 │   ├── mutation_spectrum
-│   ├── QC1
 │   ├── QC2
 │   ├── QC3
 │   ├── QC4
@@ -208,6 +205,14 @@ root_directory
 │   └── {species}_{child}_ped.ped
 
 ```
+
+## Github Structure 
+
+- `src/` — source code for the Snakemake 
+- `config/` - YAML config
+- `README.md` - This file
+
+
 ## Contributing
 
 Guidelines for pull requests, issues, and coding style.

@@ -38,6 +38,10 @@ Steps to install dependencies and set up the environment.
 conda create -c conda-forge -c bioconda -n pipeline snakemake=8.14.0
 conda activate pipeline
 ```
+ 3. Once snakemake is uplod a properly, activate the environment.
+```bash
+conda activate snakemake
+```
 
 ## How to use the Project:
 
@@ -90,7 +94,39 @@ Optional:
 Do not edit:
  + Mutation Spectrum notation for filing in groups of AC, CT, CG, CA, AT, and AG
 
+### Bash walkthrough
 
+Command Explanations
+ 1. `-n` / `--dry-run`	: This generates a detailed preview of all rules that will be activated and the number of files to be processed. It allows you to double-check wildcards and ensure no rules are missing without actually executing code.
+ 2. `-s <file>.smk` :	By default, Snakemake looks for a file named Snakefile or snakefile. If your file is named something else (e.g., `pipeline_v1.smk`), you must use this flag to point to it.
+ 3. `-R` / `--force-run` :	Forces the re-execution of a specific rule or all rules. Useful if you've updated code but the input files haven't changed.
+ 4. `--rerun-incomplete`	: Automatically re-runs jobs that were interrupted or terminated before finishing in a previous run.
+ 5. `--rerun-triggers mtime` :	Tells Snakemake to trigger a re-run only if the modification time of an input file has changed.
+ 6. `--latency-wait <sec>`	: Defines how many seconds to wait for an output file to appear after a job finishes. Essential for network file systems (like HPC clusters) where file syncing can be slow.
+ 7. `--summary`	: Prints a table summarizing the status of all files in the pipeline (e.g., modification time, rule used, and if it needs to be updated).
+
+Before submitting a pipeline, always perform a dry run to verify that wildcards are correct and no rules are missing. This generates a preview of the jobs to be executed without actually running them.
+```bash
+# Run a dry run
+snakemake --dry-run
+
+# Run a dry run for a specific file not named 'Snakefile'
+snakemake -s type_in_file.smk --dry-run
+```
+
+Bash Script Template:
+```bash
+#!/bin/bash
+# (Insert your specific scheduler directives here, e.g., #SBATCH or #PBS)
+snakemake \
+    -R \
+    -s type_in_file_.smk \
+    --cores <number_of_cores> \
+    --use-envmodules \
+    --rerun-incomplete \
+    --rerun-triggers mtime \
+    --latency-wait <seconds>
+```
 
 ### de_novo_filters.py walkthrough
 

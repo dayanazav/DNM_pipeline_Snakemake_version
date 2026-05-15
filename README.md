@@ -142,8 +142,38 @@ snakemake \
 
 Examples of how to run the code or workflow.
 
-## Repository Structure
+## Snakemake's Output Structure
 
+Additional Files: species.yaml, all of the 4 python scripts, reference genome, and indexed reference genome
+    + Special Note: If these additional files were detailed with their absolute path within the YAML file, then you do not have to switch their current location to the root_directory.
+```
+---
+root_directory
+│
+├── species.yaml
+├── Snakefile
+├── run_snakefile.sh 
+├ ─ Additional Files* 
+├── output
+│   ├── bams
+│   ├── DNM
+│   ├── DNM_summary
+│   ├── CombinedGVCF
+│   ├── GenotypeGVCF
+│   ├── HaplotypeCaller
+│   ├── log
+│   ├── mutation_spectrum
+│   ├── QC1
+│   ├── QC2
+│   ├── QC3
+│   ├── unknown_CombinedGVCF
+│   ├── unknown_GenotypeGVCF
+│   ├── unknown_HaplotypeCaller
+│   │    ├── unknown_haplotypeCaller_chr1.vcf, etc.
+│   │    ├── benchmark
+
+│   └── hg19.fa.sa
+```
 - `src/` — source code for the Snakemake 
 - `config/` - YAML config
 - `README.md` - This file

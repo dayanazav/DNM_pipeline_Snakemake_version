@@ -150,7 +150,6 @@ Additional Files: species.yaml, all of the 4 python scripts, reference genome, a
 # Running with a known_variant.vcf file
 root_directory
 │
-├── species.yaml
 ├── Snakefile
 ├── run_snakefile.sh 
 ├ ─ Additional Files* 
@@ -176,7 +175,6 @@ root_directory
 # Running without a known_variant.vcf file
 root_directory
 │
-├── species.yaml
 ├── Snakefile
 ├── run_snakefile.sh 
 ├ ─ Additional Files* 

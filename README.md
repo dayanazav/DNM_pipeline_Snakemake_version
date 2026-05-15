@@ -131,7 +131,7 @@ snakemake \
 ## Snakemake's Output Structure
 
 Additional Files: species.yaml, all of the 4 python scripts, reference genome, and indexed reference genome
-    + Special Note: If these additional files were detailed with their absolute path within the YAML file, then you do not have to switch their current location to the root_directory.
+ + Special Note: If these additional files were detailed with their absolute path within the YAML file, then you do not have to switch their current location to the root_directory.
 ```
 # Running with a known_variant.vcf file
 root_directory

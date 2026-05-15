@@ -147,7 +147,7 @@ Examples of how to run the code or workflow.
 Additional Files: species.yaml, all of the 4 python scripts, reference genome, and indexed reference genome
     + Special Note: If these additional files were detailed with their absolute path within the YAML file, then you do not have to switch their current location to the root_directory.
 ```
----
+# When 
 root_directory
 │
 ├── species.yaml
@@ -162,22 +162,52 @@ root_directory
 │   ├── GenotypeGVCF
 │   ├── HaplotypeCaller
 │   ├── log
+│   ├── make_pedigree
 │   ├── mutation_spectrum
 │   ├── QC1
 │   ├── QC2
 │   ├── QC3
-│   ├── unknown_CombinedGVCF
-│   ├── unknown_GenotypeGVCF
-│   ├── unknown_HaplotypeCaller
-│   │    ├── unknown_haplotypeCaller_chr1.vcf, etc.
-│   │    ├── benchmark
-
-│   └── hg19.fa.sa
+│   ├── QC4
+│   └── hg19.fa.ped
 ```
 - `src/` — source code for the Snakemake 
 - `config/` - YAML config
 - `README.md` - This file
 
+```
+# 
+root_directory
+│
+├── species.yaml
+├── Snakefile
+├── run_snakefile.sh 
+├ ─ Additional Files* 
+├── output
+│   ├── bams
+│   ├── BaseRecal
+│   ├── DNM
+│   ├── DNM_summary
+│   ├── CombinedGVCF
+│   ├── GATKfilters
+│   ├── GenotypeGVCF
+│   ├── HaplotypeCaller
+│   ├── known_variants
+│   ├── log
+│   ├── make_pedigree
+│   ├── mutation_spectrum
+│   ├── QC1
+│   ├── QC2
+│   ├── QC3
+│   ├── QC4
+│   ├── unknown_CombinedGVCF
+│   ├── unknown_GenotypeGVCF
+│   ├── unknown_HaplotypeCaller
+│   │    ├── unknown_haplotypeCaller_chr1.vcf, etc.
+│   │    ├── benchmark
+│   ├── vio_mend
+│   └── hg19.fa.ped
+
+```
 ## Contributing
 
 Guidelines for pull requests, issues, and coding style.

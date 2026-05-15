@@ -67,7 +67,28 @@ The YAML file is a configuration file for our snakemake file.
 
 Purpose: store all of our information is because it allows us to switch between samples without the need to edit the main snakemake file.
 
-The YAML context should contain:
+
+Need to add:
+ + Paste in the species’ name
+ + Directory path to your chosen output folder to contain all of the output files, log files, benchmark files, etc.
+ + Path to this YAML file, Reference Genome, and Reference Index
+ + Packages
+     + Paste in their paths for the params directive can load them on to shell directive
+     + Paste in the command from the blank in `load module ___`, so envmodules directive can load it 
+ + Samples’ names or label IDs
+ + The stating the 3 or 4 main relationships (i.e. father, mother, offspring, and grandchild*) in the pedigree
+
+Either option works:
+ + Known Variant File:
+     + Paste in the path to the current list of known variant
+     + Leave it blank
+
+Optional:
+ + Offspring's gender as Male, Female, or * (default = *)
+
+Do not edit:
+ + Mutation Spectrum notation for filing in groups of AC, CT, CG, CA, AT, and AG
+
 
 
 ### de_novo_filters.py walkthrough

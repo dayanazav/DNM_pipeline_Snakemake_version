@@ -3,8 +3,21 @@
 Short description of what this project does and why it matters.
 
 ## Installation
-
 Steps to install dependencies and set up the environment.
+Requires `python3.8+`
+Install dependencies:
+```
+pip install cython scipy  --upgrade
+```
+Install `admixfrog` (from github):
+```
+pip install git+https://github.com/benjaminpeter/admixfrog@0.7.3
+```
+
+Install `admixfrog` (from source directory):
+```
+pip install .
+```
 
 ## Usage
 

@@ -204,13 +204,6 @@ root_directory
 
 ```
 
-## Github Structure 
-
-- `src/` — source code for the Snakemake 
-- `config/` - YAML config
-- `README.md` - This file
-
-
 ## Contributing
 
 Guidelines for pull requests, issues, and coding style.

@@ -5,8 +5,8 @@ DOWNLOAD_URLS:
 
 DOWNLOAD_FILES:
   KNOWN_SITES: "/path/to/output/downloaded/known_variants_chr{chr}.vcf" # OPTIONAL 
-  REF_GENOME: "/path/to/output/downloaded/species.fa.gz"
-  REF_INDEX: "/path/to/output/downloaded/species.fa.fai"
+  REF_GENOME: "/path/to/output/downloaded/species.fa.gz" # OPTIONAL 
+  REF_INDEX: "/path/to/output/downloaded/species.fa.fai" # OPTIONAL 
   FASTQ1: "path/to/{sample}_R1.fastq.gz" # OPTIONAL 
   FASTQ2: "path/to/{sample}_R2.fastq.gz" # OPTIONAL 
 

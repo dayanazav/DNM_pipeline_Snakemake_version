@@ -1,59 +1,65 @@
 DOWNLOAD_URLS:
-  KNOWN_SITES_URL: None
-  REF_GENOME_URL: None
-  REF_INDEX_URL: None
+  KNOWN_SITES_URL: None # OPTIONAL 
+  REF_GENOME_URL: None # OPTIONAL 
+  REF_INDEX_URL: None # OPTIONAL 
 
 DOWNLOAD_FILES:
-  KNOWN_SITES: "/path/to/output/downloaded/known_variants_chr{chr}.vcf"
+  KNOWN_SITES: "/path/to/output/downloaded/known_variants_chr{chr}.vcf" # OPTIONAL 
   REF_GENOME: "/path/to/output/downloaded/species.fa.gz"
   REF_INDEX: "/path/to/output/downloaded/species.fa.fai"
-  FASTQ1: "path/to/{sample}_R1.fastq.gz"
-  FASTQ2: "path/to/{sample}_R2.fastq.gz"
+  FASTQ1: "path/to/{sample}_R1.fastq.gz" # OPTIONAL 
+  FASTQ2: "path/to/{sample}_R2.fastq.gz" # OPTIONAL 
 
 SPECIES: "species"
 
-# is should be config["CHROMO"]
+# these are connect to the snakefile via config["CHROMO"]
 YAML: "/path/to/species.yaml"
-CHROMO: [1,2,3,4,5,6,7,8,9,10]
+CHROMO: [1,2A,2B,3,4,5,6,7,8,9,10]
 PATH: "/path/to/output"
 REF_GENOME: "/path/to/species.fa"
-REF_INDEX: "/path/to/species.fa.fai"
-DEPTH: "{folder}/QC2/{sample}_gwide_coverage.txt"
-OFFSPRING: "/path/to/C_check"
+REF_INDEX: "/path/to/species.fa.fai" 
+DEPTH: "{folder}/QC2/{sample}_gwide_coverage.txt" # DO NOT EDIT
 KNOWN_SITES: "/path/to/known_variants_chr{chr}.vcf"
 
-# Searched as config["PYTHON_SCRIPTS"]["FILTERS"]
-PYTHON_SCRIPTS:
-  FILTERS: "/path/to/de_novo_filters.py" # this python script contains all of the 10 filters and Transmission filter
-  TABLES: "/path/to/de_novo_tables.py" # will create two tables for the overall drop of counts per filter ans list all of the de novo mutation
-
-# all of the modules, tools, and apps that used
-# Searched as config["TABIX"]
-TABIX: "/path/to/tabix" # tabix to take the compress files to make index files
-BGZIP: "/path/to/gzip" # bgzip to make compress file 
-SEQTK: "/path/to/seqtk" # to help with fastq to bam file
-OLDBWA: "/path/to/oldBwa" # to help with fastq to bam file
-SAMBLASTER: "/path/to/samblaster" # to help with fastq to bam file
+# Extracted as config["PYTHON_SCRIPTS"]["FILTERS"]
+SCRIPTS:
+  FILTERS: "/path/to/de_novo_filters.py" # this python script contains all of the 10 filters and transmission filter
+  TABLES: "/path/to/de_novo_tables.py" # will create two tables for the overall drop of counts per filter and list all of the de novo mutations
+  DNM_GRAPH: "/path/to/de_novo_graph.py" # creates a graph to visualize the effects of the filters on the de novo mutations
+  MUT_SPEC: "/path/to/mutation_spectrum_graph.py" # the graph for the mutation specturm with error bars
+  
+#########
+# These are all of the modules, tools, and apps used in the snakefile
+# and snakefile is able to extract the below packages as config["BGZIP"]
+# NOTE: You can change the between these two formats, path or envmodules, in both YAML file and snakefile. 
+#########
+#> Paste the paths to the packages for bash script activation
+BGZIP: "/path/to/gzip" # bgzip compresses files as .gz
+TABIX: "/path/to/tabix" # tabix to take in make index files for newly compressed files
+SEQTK: "/path/to/seqtk" # seqtk to help convert the FASTQ file to a BAM file
+OLDBWA: "/path/to/oldBwa" # oldbwa to help convert the FASTQ file to a BAM file
+SAMBLASTER: "/path/to/samblaster" # samblaster to help convert the FASTQ file to a BAM file
+GATK: "/path/to/gatk-4.1.9.0/gatk" # Genome Anaylsis Toolkit version 4.1.9.0
+#> Paste in the last word(s) from "load module ___" and these will be activated within the envmodules directive 
+SAMTOOLS: "/path/to/samtools" # samtools helps with converting the FASTQ to BAM, sorting, indexing, and measure depth
+JAVA: "/path/to/java" # java helps organize the memory for GATK 
+BCFTOOLS: "/path/to/bcftools" # bcftools allows us to read and filter information from a vcf file
+BEDTOOLS: "/path/to/bedtools2" # bedtools allows us to read and filter information from two vcf files
+R: "/path/to/r" # R allows us to visualize one of our quality checks
+PYTHON: "/path/to/python" # Using the python packages of yaml, os, pandas, argparse, re, and matplotlib.pyplot
 BWAMEMS: "/path/to/bwa-mem2"
-SAMTOOLS: "/path/to/samtools"
-GATK: "/path/to/gatk-4.1.9.0/gatk" # Genome Anaylsis Toolkit 4.1.9.0
-JAVA: "/path/to/java"
-BCFTOOLS: "/path/to/bcftools"
-BEDTOOLS: "/path/to/bedtools2"
-R: "/path/to/r"
-PYTHON: "/path/to/python"
 
-# Searched as config["SAMPLES"]["mother"]["name"]
+# Snakefile extracts the family's information as config["SAMPLES"]["mother"]["name"]
 SAMPLES:
    mother: 
-     name: &mom "A" # MotherName
+     name: &mom "A" # Mother Name or label
    father: 
-     name: &dad "B" # FatherName
+     name: &dad "B" # Father Name or label
    child:
-     gender: "Male or Female or *"
-     name: &kid "C" # OFfspring Name
+     gender: "Male or Female or *" # Offspring Gender
+     name: &kid "C" # Offspring Name or label
    f2: 
-     name: &grand "D" # Grandchild Name
+     name: &grand "D" # Required: (Grandchild's Name or label) OR (False or None or "")
    quad:
      - *dad
      - *mom
@@ -64,5 +70,13 @@ SAMPLES:
      - *mom
      - *kid
      - *grand
-     - "E" # extra individuals in the pedigrees
+     - "Extra grandchildern" # Add extra grandchildern by their Name or label to the pedigree 
 
+# Used for the final section on creating the mutation specturm graph
+mutation_spectrum:
+  - "AC"
+  - "CT"
+  - "CG"
+  - "CA"
+  - "AT"
+  - "AG"

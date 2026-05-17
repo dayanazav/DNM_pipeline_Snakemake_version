@@ -10,9 +10,8 @@ DOWNLOAD_FILES:
   FASTQ1: "path/to/{sample}_R1.fastq.gz" # OPTIONAL 
   FASTQ2: "path/to/{sample}_R2.fastq.gz" # OPTIONAL 
 
+# These are connected to the snakefile via config["SPECIES"]
 SPECIES: "species"
-
-# These are connected to the snakefile via config["CHROMO"]
 YAML: "/path/to/species.yaml"
 CHROMO: [1,2A,2B,3,4,5,6,7,8,9,10]
 PATH: "/path/to/output"
@@ -20,14 +19,12 @@ REF_GENOME: "/path/to/species.fa"
 REF_INDEX: "/path/to/species.fa.fai" 
 DEPTH: "{folder}/QC2/{sample}_gwide_coverage.txt" # DO NOT EDIT
 KNOWN_SITES: "/path/to/known_variants_chr{chr}.vcf"
+DNM_FILTERS: "/path/to/de_novo_filters.py" # this python script contains all of the 10 filters and transmission filter
+DNM_TABLES: "/path/to/de_novo_tables.py" # will create two tables for the overall drop of counts per filter and list all of the de novo mutations
+DNM_GRAPH: "/path/to/de_novo_graph.py" # creates a graph to visualize the effects of the filters on the de novo mutations
+MUT_SPEC: "/path/to/mutation_spectrum_graph.py" # the graph for the mutation specturm with error bars
+mutation_types: ["AC", "CT", "CG", "CA", "AT", "AG"] # Used to search, calculate, and generate mutation spectrum for all of mutation types
 
-# Extracted as config["PYTHON_SCRIPTS"]["FILTERS"]
-SCRIPTS:
-  FILTERS: "/path/to/de_novo_filters.py" # this python script contains all of the 10 filters and transmission filter
-  TABLES: "/path/to/de_novo_tables.py" # will create two tables for the overall drop of counts per filter and list all of the de novo mutations
-  DNM_GRAPH: "/path/to/de_novo_graph.py" # creates a graph to visualize the effects of the filters on the de novo mutations
-  MUT_SPEC: "/path/to/mutation_spectrum_graph.py" # the graph for the mutation specturm with error bars
-  
 #########
 # These are all of the modules, tools, and apps used in the snakefile
 # and snakefile is able to extract the below packages as config["BGZIP"]
@@ -71,12 +68,3 @@ SAMPLES:
      - *kid
      - *grand
      - "Extra grandchildern" # Add extra grandchildern by their Name or label to the pedigree 
-
-# Used for the final section on creating the mutation specturm graph
-mutation_spectrum:
-  - "AC"
-  - "CT"
-  - "CG"
-  - "CA"
-  - "AT"
-  - "AG"

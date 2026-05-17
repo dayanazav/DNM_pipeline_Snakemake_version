@@ -69,8 +69,7 @@ s h:m:s max_rss max_vms max_uss max_pss io_in io_out mean_load cpu_time
 ### YAML walkthrough
 The YAML file is a configuration file for our snakemake file.
 
-Purpose: store all of our information is because it allows us to switch between samples without the need to edit the main snakemake file.
-
+Purpose: to run different species through its own unique YAML file without the need to directly edit the snakemake file to allow for quick reproducible.
 
 Need to add:
  + Paste in the species’ name

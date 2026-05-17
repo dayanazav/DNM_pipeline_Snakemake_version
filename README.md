@@ -43,15 +43,15 @@ conda activate pipeline
 conda activate snakemake
 ```
 
-## How to use the Project:
+## Overview
 
-### Snakefile walkthrough
+### Snakefile
  + Key section: at the top of the snakemake file. This Key section contains the configuration file of our only YAML file. Then, followed by the extracted information from the YAML file.
  + Rule: Rules can house multiple directives to provide the necessary commands for that specific input file(s) to become the output file(s). We used these directives: input, output, envmodules, params, threads, resources, log, benchmark, and shell.
  + 
  +
 
-#### Directive walkthrough
+#### Directive
 +  Input directive contains the file(s) that we want to analyze.
 +  Output directive contains the output file(s) that we wish to generate. Here is where we can perform three reformatting steps: renaming, relocating, and changing the file text. After each edit in the current output directive, always compare and match the current rule’s output file name(s) with corresponding rule’s input file name(s) because these file name(s) need to match to guarantee these rules are paired and continuous.
 +  Envmodules directive contains all of the modules needed to load per rule. In order to activate this directive, we have to use the command `--use-envmodules` in the main bash script command. Housing java, samtools, bedtools, bcftools, python, R.
@@ -66,34 +66,12 @@ s h:m:s max_rss max_vms max_uss max_pss io_in io_out mean_load cpu_time
 +  Shell directive will tie all of the previous directives to format the complete bash script to pipe our input file(s) into output file(s). This tying process is via wildcards, which will be explained later. Additionally, we can activate our packages (e.g., GATK, Tabix, etc.) using their corresponding paths, which are stored and extracted from the YAML file.
 +  Other directives: If you are curious about what other directives are available, feel free to check them out on your own time.
 
-### YAML walkthrough
+### YAML 
 The YAML file is a configuration file for our snakemake file.
 
 Purpose: to run different species through its own unique YAML file without the need to directly edit the snakemake file to allow for quick reproducible.
 
-Need to add:
- + Paste in the species’ name
- + Directory path to your chosen output folder to contain all of the output files, log files, benchmark files, etc.
- + Path to this YAML file, Reference Genome, and Reference Index
- + Packages
-     + Paste in their paths for the params directive can load them on to shell directive
-     + Paste in the command from the blank in `load module ___`, so envmodules directive can load it 
- + Samples’ names or label IDs
- + The stating the 3 or 4 main relationships (i.e. father, mother, offspring, and grandchild*) in the pedigree
- + Species’ chromosome as an expanded list `[1, …, n]`
-
-Either option works:
- + Known Variant File:
-     + Paste in the path to the current list of known variant
-     + Leave it blank so snakemake can make its own Known Variant File
-
-Optional:
- + Offspring's gender as Male, Female, or * (default = *)
-
-Do not edit:
- + Mutation Spectrum notation for filing in groups of AC, CT, CG, CA, AT, and AG
-
-### Bash walkthrough
+### Bash Script
 
 Command Explanations
  1. `-n` / `--dry-run`	: This generates a detailed preview of all rules that will be activated and the number of files to be processed. It allows you to double-check wildcards and ensure no rules are missing without actually executing code.
@@ -186,7 +164,6 @@ root_directory
     │    └── benchmark
     ├── vio_mend
     └── {species}_{child}_ped.ped
-
 ```
 
 ## Contributing

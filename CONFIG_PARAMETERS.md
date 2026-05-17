@@ -7,7 +7,7 @@
 #### Notation:
 
 1. **SPECIES**
-    - Name of the given species
+    - Name of the given species. Used to title files and graphs.
     - Example: `"ape"`
   
 2. **YAML**
@@ -45,6 +45,10 @@
 10. **MUT_SPEC**
     - Path to the python script which creates a graph of the the offspring's mutation specturm with 95% CI error bars.
     - Example: `"/path/to/mutation_spectrum_graph.py"`
+
+11. **mutation_types**
+    - Nesscary for rules `_`, `_`, and **MUT_SPEC** to calulate all precentages and generate a graph through the python script, **MUT_SPEC**.
+    - Default: `["AC", "CT", "CG", "CA", "AT", "AG"]`
 
 Optional:
 
@@ -97,6 +101,3 @@ SAMPLES:
      - "Extra grandchildern" # Add extra grandchildern by their Name or label to the pedigree 
 
    
-1. **mutation_types**
-    - Nesscary for rules `_`, `_`, and **MUT_SPEC** to calulate all precentages and generate a graph through the python script, **MUT_SPEC**.
-    - Default: `["AC", "CT", "CG", "CA", "AT", "AG"]`

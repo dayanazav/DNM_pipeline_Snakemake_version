@@ -27,7 +27,7 @@ Directives are sub-headers within a Rule. Each Rule is its own unique job.
     ```
     
 7. **`message`**
-    +  Message directive prints out the command within the `shell` directive. A great way to understand how all of the directives are inneracting to check for syntax.
+    +  Message directive prints out its context instead of Snakemake's default summary. By putting the command within the `shell` directive, it becomes a great way to understand how all of the directives are inneracting to check for syntax.
   
 8. **`shell`**
     +  Shell directive will tie all of the previous directives to format the complete bash script to pipe our input file(s) into output file(s). This tying process is via wildcards, which will be explained later. Additionally, we can activate our packages (e.g., GATK, Tabix, etc.) using their corresponding paths, which are stored and extracted from the YAML file.

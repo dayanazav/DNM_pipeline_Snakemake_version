@@ -198,7 +198,7 @@ rule qc2_coverage_estimation:
 
 rule unknown_HaplotypeCaller:
     input:
-        nonbqsr = "{folder}/bams/{sample}_sort.bam", #editted
+        nonbqsr = "{folder}/bams/sort_{sample}.bam", #editted
         Qc2 = expand("{folder}/QC2/{sample}_gwide_coverage.txt", folder=FOLDER, sample=SAMPLES)
     output:
         new = "{folder}/unknown_HaplotypeCaller/nonbqsr_{sample}_chr{chr}.g.vcf.gz"

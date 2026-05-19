@@ -24,25 +24,21 @@ DNM_GRAPH: "/path/to/de_novo_graph.py" # creates a graph to visualize the effect
 MUT_SPEC: "/path/to/mutation_spectrum_graph.py" # the graph for the mutation specturm with error bars
 mutation_types: ["AC", "CT", "CG", "CA", "AT", "AG"] # Used to search, calculate, and generate mutation spectrum for all of mutation types
 
-#########
-# These are all of the modules, tools, and apps used in the snakefile
-# and snakefile is able to extract the below packages as config["BGZIP"]
-# NOTE: You can change the between these two formats, path or envmodules, in both YAML file and snakefile. 
-#########
-#> Paste the paths to the packages for bash script activation
-BGZIP: "/path/to/gzip" # bgzip compresses files as .gz
-TABIX: "/path/to/tabix" # tabix to take in make index files for newly compressed files
-SEQTK: "/path/to/seqtk" # seqtk to help convert the FASTQ file to a BAM file
-OLDBWA: "/path/to/oldBwa" # oldbwa to help convert the FASTQ file to a BAM file
-SAMBLASTER: "/path/to/samblaster" # samblaster to help convert the FASTQ file to a BAM file
-GATK: "/path/to/gatk-4.1.9.0/gatk" # Genome Anaylsis Toolkit version 4.1.9.0
-#> Paste in the last word(s) from "load module ___" and these will be activated within the envmodules directive 
-SAMTOOLS: "/path/to/samtools" # samtools helps with converting the FASTQ to BAM, sorting, indexing, and measure depth
-JAVA: "/path/to/java" # java helps organize the memory for GATK 
-BCFTOOLS: "/path/to/bcftools" # bcftools allows us to read and filter information from a vcf file
-BEDTOOLS: "/path/to/bedtools2" # bedtools allows us to read and filter information from two vcf files
-R: "/path/to/r" # R allows us to visualize one of our quality checks
-PYTHON: "/path/to/python" # Using the python packages of yaml, os, pandas, argparse, re, numpy, and matplotlib.pyplot
+# These are all of the modules, tools, and packages used in the snakefile
+# SPECIAL NOTE: You can change the between these two formats, path or envmodules, in both YAML file and snakefile. 
+# More detail in CONFIG_PARAMETERS.md
+BGZIP: "/path/to/gzip" 
+TABIX: "/path/to/tabix" 
+SEQTK: "/path/to/seqtk" 
+OLDBWA: "/path/to/oldBwa" 
+SAMBLASTER: "/path/to/samblaster" 
+GATK: "/path/to/gatk-4.1.9.0/gatk" 
+SAMTOOLS: "/path/to/samtools" 
+JAVA: "/path/to/java"  
+BCFTOOLS: "/path/to/bcftools" 
+BEDTOOLS: "/path/to/bedtools2" 
+R: "/path/to/r" 
+PYTHON: "/path/to/python" 
 
 # Snakefile extracts the family's information as config["SAMPLES"]["mother"]["name"]
 SAMPLES:

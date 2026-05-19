@@ -43,7 +43,6 @@ BCFTOOLS: "/path/to/bcftools" # bcftools allows us to read and filter informatio
 BEDTOOLS: "/path/to/bedtools2" # bedtools allows us to read and filter information from two vcf files
 R: "/path/to/r" # R allows us to visualize one of our quality checks
 PYTHON: "/path/to/python" # Using the python packages of yaml, os, pandas, argparse, re, numpy, and matplotlib.pyplot
-BWAMEMS: "/path/to/bwa-mem2"
 
 # Snakefile extracts the family's information as config["SAMPLES"]["mother"]["name"]
 SAMPLES:

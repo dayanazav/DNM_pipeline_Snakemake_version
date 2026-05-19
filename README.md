@@ -76,7 +76,7 @@ Purpose: The DAG display how the rules are connected to provide an overview of w
 snakemake --forceall --rulegraph | dot -Tpdf > path/to/workflow_dag.pdf.
 ```
 
-[More Info.](https://snakemake.readthedocs.io/en/v8.4.1/executing/cli.html#visualization)
+[More Info. on DAG on the Official Snakemake Website](https://snakemake.readthedocs.io/en/v8.4.1/executing/cli.html#visualization)
 
 ## Usage Instructions
 

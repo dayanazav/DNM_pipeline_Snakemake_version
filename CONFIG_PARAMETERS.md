@@ -121,10 +121,6 @@ _Modules, Languages, and Tools:_
     - Using the python packages of `yaml`, `os`, `pandas`, `argparse`, `re`, `numpy`, and `matplotlib.pyplot`
     - Option 2: `"python"`
    
-13. **BWAMEMS**
-    - *
-    - Option 2: `"bwa-mem2"`
-
 ---
 
 Snakefile notation to extract the mother's name: `config["SAMPLES"]["mother"]["name"]`

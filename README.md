@@ -86,7 +86,7 @@ Once you have:
 - Built the human reference genome index
 - Built the clean FASTQ files or bams for each individual
 - Downloaded our 4 python scripts and `snakefile_dnm`
-- The file sturcture looks like this:
+- The file structure looks like this:
     - Additional Files: species.yaml, all of the 4 python scripts, reference genome, indexed reference genome, and if you have it the known variant vcf file. If these additional files were detailed with their absolute path within the YAML file, then you do not have to switch their current location to the root_directory.
 
 ```

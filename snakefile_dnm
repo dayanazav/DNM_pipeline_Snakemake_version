@@ -167,7 +167,7 @@ rule qc2_coverage_estimation:
     envmodules:
         config['SAMTOOLS']
     params:
-        coverage = lambda wildcards: config['SAMPLES'][wildcards.sample]['coverage']
+        coverage = lambda wildcards: config['Coverage'][wildcards.sample]
     log:
         "{folder}/log/QC2/{sample}_QC2.log"
     benchmark:

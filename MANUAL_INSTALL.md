@@ -22,6 +22,14 @@ This pipeline is managed via a Conda environment to ensure all dependencies are 
 
 #### Scripting & Visualization
 
- + Python: Custom scripts utilize `pandas`, `argparse`, `matplotlib`, `numpy`, `yaml`, `sys`, `stats` from `scipy`, and `getopt`.
+ + Python (version >= 3.11.6)
+     + `pandas` (version >= 2.2.2)
+     + `argparse` (version >= 1.1)
+     + `matplotlib` (version >= 3.8.4)
+     + `numpy` (version >= 1.26.4)
+     + `yaml` (version >= 6.0.1)
+     + `sys` 
+     + `stats` from `scipy` (version >= 1.13.1)
+     + `getopt`
 
  + R: Used for generating visualizations for quality control check 3 (QC3).

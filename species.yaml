@@ -51,6 +51,8 @@ SAMPLES:
      name: &kid "C" # Offspring Name or label
    f2: 
      name: &grand "D" # Required: (Grandchild's Name or label) OR (False or None or "")
+   f2.2: # Optional: add the name/label, additional tag, and coverage (all three required)
+     name: &grand2 "E" # Optional: Add extra grandchildern by their Name or label to the pedigree 
    quad:
      - *dad
      - *mom
@@ -61,4 +63,13 @@ SAMPLES:
      - *mom
      - *kid
      - *grand
-     - "Extra grandchildern" # Add extra grandchildern by their Name or label to the pedigree 
+     - *grand2 # Optional: Add extra tag
+
+# Remove 'mom_name' and of the like by replacing this with the exact same name as above
+# Then on the right side, put put the coverage as an interger of FASTQ to bam 
+Coverage:
+   mom_name: 20 
+   dad_name: 20
+   offspring_name: 20
+   grand_name: 20 
+   grand2_name: 20 # Optional: coverage

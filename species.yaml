@@ -17,7 +17,6 @@ CHROMO: [1,2A,2B,3,4,5,6,7,8,9,10]
 PATH: "/path/to/output"
 REF_GENOME: "/path/to/species.fa"
 REF_INDEX: "/path/to/species.fa.fai" 
-DEPTH: "{folder}/QC2/{sample}_gwide_coverage.txt" # DO NOT EDIT
 KNOWN_SITES: "/path/to/known_variants_chr{chr}.vcf"
 DNM_FILTERS: "/path/to/de_novo_filters.py" # this python script contains all of the 10 filters and transmission filter
 DNM_TABLES: "/path/to/de_novo_tables.py" # will create two tables for the overall drop of counts per filter and list all of the de novo mutations

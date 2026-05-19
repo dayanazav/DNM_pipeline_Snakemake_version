@@ -25,11 +25,14 @@ Directives are sub-headers within a Rule. Each Rule is its own unique job.
 
     0.9619 0:00:00 14.50 105.73 1.91 3.82 48.00 0.00 0.00 0.96
     ```
-
-7. **`shell`**
+    
+7. **`message`**
+    +  Message directive prints out the command within the `shell` directive. A great way to understand how all of the directives are inneracting to check for syntax.
+  
+8. **`shell`**
     +  Shell directive will tie all of the previous directives to format the complete bash script to pipe our input file(s) into output file(s). This tying process is via wildcards, which will be explained later. Additionally, we can activate our packages (e.g., GATK, Tabix, etc.) using their corresponding paths, which are stored and extracted from the YAML file.
 
-8. **Others**
+9. **Others**
     +  Other directives: If you are curious about what other directives are available, feel free to check them out on your own time.
   
 ## Rules:

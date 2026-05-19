@@ -42,30 +42,26 @@ Depending on what is the best why to activate these, you can choose either to ac
     - Path to the species' indexed reference genome.
     - Example: `"/path/to/species.fa.fai"`
 
-7. **DEPTH**
-    - Allows `rule DNM_Filters:` quick access to the sample's depth from `rule qc2_coverage_estimation:`.
-    - DO NOT EDIT: `"{folder}/QC2/{sample}_gwide_coverage.txt"`
-
-8. **DNM_FILTERS**
+7. **DNM_FILTERS**
     - Path to the python script which contains all of the 10 filters and transmission filter
     - Example: `"/path/to/de_novo_filters.py"`
       
-9. **DNM_TABLES**
+8. **DNM_TABLES**
     - Path to the python script which creates three tables:
       a. 
       b. containing that final discovered de novo mutations of the offspring
       c. the transmissions within the grandchild, if the grandchild is present.
     - Example: `"/path/to/de_novo_tables.py"`
   
-10. **DNM_GRAPH**
+9. **DNM_GRAPH**
     - Path to the python script which creates a graph to visualize the effects of the filters on the de novo mutations with the offspring and the transmission, if the grandchild is present.
     - Example: `"/path/to/de_novo_graph.py"`
 
-11. **MUT_SPEC**
+10. **MUT_SPEC**
     - Path to the python script which creates a graph of the the offspring's mutation specturm with 95% CI error bars.
     - Example: `"/path/to/mutation_spectrum_graph.py"`
 
-12. **mutation_types**
+11. **mutation_types**
     - Nesscary for `rule _`, `rule _`, and `rule _` to calulate all precentages and generate a graph through the python script, **MUT_SPEC**.
     - Default: `["AC", "CT", "CG", "CA", "AT", "AG"]`
 
